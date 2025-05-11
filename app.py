@@ -3,18 +3,29 @@ import joblib
 import pandas as pd
 
 app = Flask(__name__)
+
+# load model
 model = joblib.load("models/heart-attack-model.pkl")
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    data = request.json
-    df = pd.DataFrame([data])
+    # Ambil data dari request
+    data = request.get_json()
+    df = pd.DataFrame(data, index=[0])
 
-    # prediksi menggunakan model yang sudah dilatih
+    # Lakukan prediksi
     prediction = model.predict(df)
-    result = "Risk" if prediction[0] == 1 else "No Risk"
+    probability = model.predict_proba(df)[:, 1]
 
-    return jsonify({"Prediction": result})
+    # Kembalikan hasil prediksi
+    return jsonify({
+        'prediction': int(prediction[0]),
+        'probability': float(probability[0])
+    })
+
+@app.route('/test', methods=['GET'])
+def test():
+    return jsonify({"Message": "Test GET API Success"})
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

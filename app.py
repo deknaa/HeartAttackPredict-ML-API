@@ -15,7 +15,7 @@ def predict():
 
     # Lakukan prediksi
     prediction = model.predict(df)
-    probability = model.predict_proba(df)[:, 1]
+    probability = model.predict_proba(df)[:, 1] # array([[0.23, 0.77]])
 
     # Kembalikan hasil prediksi
     return jsonify({
